@@ -126,13 +126,14 @@ if analyze_btn and news_input:
             st.error(f"❌ Connection Failed: {e}")
 
 # 6. Live Logs Section (Auto-refresh)
+# 6. Live Logs Section (Auto-refresh)
 st.markdown("---")
 st.subheader("🗄️ Live Disagreement Logs (MongoDB)")
 
 col_log1, col_log2 = st.columns([4, 1])
 with col_log2:
     if st.button("🔄 Refresh Logs"):
-        st.experimental_rerun()
+        st.rerun()  # <--- UPDATED COMMAND
 
 try:
     logs_res = requests.get(f"{API_URL}/logs")
