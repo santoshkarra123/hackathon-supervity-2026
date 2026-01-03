@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+streamlit
+scikit-learn
+pandas
+pymongo
+langchain
+langchain-openai
+python-dotenv
+joblib
+numpy
+pydantic
+requests
