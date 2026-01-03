@@ -1,8 +1,9 @@
+# ⚡ FinSent Battle Arena: Hybrid AI Financial Sentiment Classifier
 
 > **Hackathon Submission for Problem Statement F3**
-> *A Hybrid AI Architecture competing Classical ML against Generative AI Agents.*
+> *A Comparative Intelligence System: Classical ML vs. Generative AI Agents*
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)](https://fastapi.tiangolo.com/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red)](https://streamlit.io/)
 [![LangChain](https://img.shields.io/badge/LangChain-AI%20Agent-orange)](https://www.langchain.com/)
@@ -10,51 +11,48 @@
 
 ---
 
-## 📖 Overview
+## 📖 Project Overview
 
-**FinSent Battle Arena** is not just a sentiment classifier; it is a comparative intelligence system designed to tackle the nuance of financial news. It pits a **Classical Machine Learning Model** (Logistic Regression + TF-IDF) against a **Generative AI Agent** (LLM with Chain-of-Thought reasoning) in real-time.
+**FinSent Battle Arena** is a real-time financial analysis platform designed to solve the "Black Box" problem in financial NLP. It pits a traditional **Classical Machine Learning Model** (Logistic Regression) against a modern **Generative AI Agent** (GPT-3.5 via LangChain) to classify financial news.
 
-While traditional models are fast, they often miss context (e.g., sarcasm or "good losses"). LLMs are smart but slower and costlier. Our system runs both, identifies disagreements, and logs these "Hard Negatives" to **MongoDB**, creating an active learning loop for future model retraining.
+Unlike standard classifiers, this system:
+1.  **Detects Disagreements:** When models conflict (e.g., ML says "Negative" due to keywords, but AI says "Positive" due to context), the system flags it.
+2.  **Explains Decisions:** The AI Agent provides a "Reasoning" and extracts the specific "Entity" involved.
+3.  **Active Learning Loop:** Disagreements are logged to MongoDB to create a "Hard Negatives" dataset for future retraining.
+
+---
 
 ## 🎯 Problem Statement (F3)
 
-**Financial News Sentiment Classifier**
-*Classify news headlines/sentences as positive/negative/neutral for market context.*
+**Objective:** Build a robust Financial News Sentiment Classifier.
+* **Challenge:** Financial text is nuanced. Phrases like "Net loss narrowed" are positive for investors, but keyword-based models often misclassify them as negative.
+* **Solution:** A Hybrid Architecture where GenAI validates Classical ML predictions, ensuring high accuracy without sacrificing speed.
 
-* **Objective:** Build a robust classifier that compares baseline classical models with Zero-Shot LLM capabilities.
-* **Deliverables:** Confusion matrix analysis, error analysis, and a scalable deployment architecture.
-* **Data Source:** [Sentiment Analysis for Financial News (Kaggle)](https://www.kaggle.com/datasets/ankurzing/sentiment-analysis-for-financial-news)
+---
 
-## 🚀 Key Features
-
-* **⚔️ Model Battle Arena:** Live side-by-side comparison of TF-IDF speed vs. LLM accuracy.
-* **🧠 Explainable AI (XAI):** The AI Agent doesn't just predict; it extracts the **Entity** (e.g., "Tesla", "The Fed") and generates a **Financial Rationale** for its decision.
-* **🛡️ Active Learning Loop:** Disagreements between models (e.g., ML says "Positive", AI says "Negative") are automatically flagged and logged to **MongoDB** for audit.
-* **📊 Bloomberg-Style Terminal:** A professional Streamlit dashboard for real-time analysis.
-* **⚡ Microservices Architecture:** Decoupled Frontend, Backend, and AI Services for scalability.
-
-## 🏗️ Architecture
+## 🏗️ Architecture & Tech Stack
 
 ```mermaid
 graph TD
-    User((User)) -->|Input Headline| UI[Streamlit Frontend]
-    UI -->|HTTP POST /analyze| API[FastAPI Backend]
+    User((User)) -->|Headline| UI[Streamlit Dashboard]
+    UI -->|API Request| API[FastAPI Backend]
     
-    subgraph "The Brain (Backend)"
-        API -->|Orchestrate| Logic[Service Layer]
-        Logic -->|Get Prediction| Classical[Classical Model (Sklearn)]
-        Logic -->|Get Reasoning| Agent[GenAI Agent (LangChain)]
-        
-        Classical -->|Label + Conf| Comparator[Comparison Logic]
-        Agent -->|Label + Reasoning| Comparator
+    subgraph "The Brain (AI Services)"
+        API -->|Predict| ML[Classical Model (Sklearn)]
+        API -->|Reason| Agent[LLM Agent (LangChain)]
     end
     
-    Comparator -->|Log Result| DB[(MongoDB)]
-    Comparator -->|JSON Response|         Fin_News_Classifier/
+    ML -->|Label + Conf| Logic[Comparison Logic]
+    Agent -->|Label + Reasoning| Logic
+    
+    Logic -->|Log Disagreements| DB[(MongoDB)]
+    Logic -->|Result| UI    
+
+    finance/
 ├── ai_services/                # [AI Layer] Logic & Training Modules
 │   ├── inference/              # Prediction scripts (Classical & LLM)
 │   ├── model_artifacts/        # Saved .pkl models
-│   └── training/               # Jupyter Notebooks for training
+│   └── training/               # Training Scripts & Notebooks
 ├── backend/                    # [API Layer] FastAPI Application
 │   ├── main.py                 # API Entry Point
 │   ├── database.py             # MongoDB Handler
@@ -62,5 +60,6 @@ graph TD
 ├── frontend/                   # [UI Layer] User Interface
 │   └── dashboard.py            # Streamlit App
 ├── data/                       # Datasets
+├── seed_data.py                # Database population script
 ├── requirements.txt            # Dependencies
-└── README.md                   # Documentation   give complete updated readme file to paste in my github 
+└── README.md                   # Documentation

@@ -5,6 +5,8 @@ scikit-learn
 pandas
 pymongo
 langchain
+langchain-community
+langchain-core
 langchain-openai
 python-dotenv
 joblib
