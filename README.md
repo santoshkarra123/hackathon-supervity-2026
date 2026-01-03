@@ -25,12 +25,15 @@ Unlike standard classifiers, this system:
 ## 🎯 Problem Statement (F3)
 
 **Objective:** Build a robust Financial News Sentiment Classifier.
-* **Challenge:** Financial text is nuanced. Phrases like "Net loss narrowed" are positive for investors, but keyword-based models often misclassify them as negative.
-* **Solution:** A Hybrid Architecture where GenAI validates Classical ML predictions, ensuring high accuracy without sacrificing speed.
+
+* **The Challenge:** Financial text is nuanced. Phrases like *"Net loss narrowed"* are actually positive for investors, but keyword-based models often misclassify them as negative because they see the word "loss".
+* **The Solution:** A Hybrid Architecture where GenAI validates Classical ML predictions. We get the **speed** of classical ML for 90% of easy cases, and the **reasoning** of LLMs for the complex 10% edge cases.
 
 ---
 
 ## 🏗️ Architecture & Tech Stack
+
+This project uses a microservices-inspired architecture separating the Frontend, Backend, and AI Inference layers.
 
 ```mermaid
 graph TD
@@ -46,20 +49,129 @@ graph TD
     Agent -->|Label + Reasoning| Logic
     
     Logic -->|Log Disagreements| DB[(MongoDB)]
-    Logic -->|Result| UI    
+    Logic -->|Result| UI
 
-    finance/
-├── ai_services/                # [AI Layer] Logic & Training Modules
-│   ├── inference/              # Prediction scripts (Classical & LLM)
-│   ├── model_artifacts/        # Saved .pkl models
-│   └── training/               # Training Scripts & Notebooks
-├── backend/                    # [API Layer] FastAPI Application
-│   ├── main.py                 # API Entry Point
-│   ├── database.py             # MongoDB Handler
-│   └── schemas.py              # Pydantic Models
-├── frontend/                   # [UI Layer] User Interface
-│   └── dashboard.py            # Streamlit App
-├── data/                       # Datasets
-├── seed_data.py                # Database population script
-├── requirements.txt            # Dependencies
-└── README.md                   # Documentation
+    Core Technologies
+Frontend: Streamlit (Instant UI for battling models).
+
+Backend: FastAPI (High-performance Async API).
+
+Classical ML: Scikit-Learn (Logistic Regression + TF-IDF).
+
+Generative AI: LangChain + OpenAI GPT-3.5 (Chain-of-Thought Reasoning).
+
+Database: MongoDB (NoSQL storage for logging "Hard Negatives").he Speed Layer (Classical ML)
+Uses LogisticRegression trained on financial headlines.
+
+Provides millisecond-latency predictions.
+
+Outputs a Confidence Score to indicate certainty.
+
+2. 🧠 The Intelligence Layer (LLM Agent)
+Uses LangChain to parse complex sentence structures.
+
+Extracts the Financial Entity (e.g., "Apple", "Tesla").
+
+Provides Natural Language Reasoning (e.g., "Although sales dropped, the guidance was raised, indicating future growth.").
+
+3. ⚔️ The Battle Arena (Consensus Logic)
+The system compares the outputs of both models in real-time.
+
+Green Flag: Both models agree (High Trust).
+
+Red Flag: Models disagree. The system relies on the LLM's reasoning but flags the instance for human review.
+
+4. 📝 Active Learning Logs
+All disagreements are saved to MongoDB.
+
+This builds a valuable dataset of "Edge Cases" that can be used to re-train and improve the Classical Model later.
+
+🛠️ Installation & Setup
+Follow these steps to run the project locally.
+
+Prerequisites
+Python 3.10 or higher
+
+Git
+
+MongoDB (Locally installed or Atlas URI)
+
+OpenAI API Key
+
+1. Clone the Repository
+Bash
+
+git clone [https://github.com/YourUsername/finance.git](https://github.com/YourUsername/finance.git)
+cd finance
+2. Create Virtual Environment
+Bash
+
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# Mac/Linux
+python3 -m venv .venv
+source .venv/bin/activate
+3. Install Dependencies
+Bash
+
+pip install -r requirements.txt
+4. Set Environment Variables
+Create a .env file in the root directory:
+
+Ini, TOML
+
+OPENAI_API_KEY=sk-your-key-here
+MONGO_URI=mongodb://localhost:27017/
+5. Train the Classical Model
+Before running the app, train the baseline model:
+
+Bash
+
+python ai_services/training/trainer.py
+(This saves sentiment_model.pkl to the artifacts folder)
+
+🖥️ Usage Guide
+You need to run the Backend and Frontend in two separate terminals.
+
+Terminal 1: Start Backend API
+
+Bash
+
+uvicorn backend.main:app --reload
+Server runs at: http://127.0.0.1:8000
+
+Terminal 2: Start Frontend Dashboard
+
+Bash
+
+streamlit run frontend/dashboard.py
+UI runs at: http://localhost:8501
+
+📂 Project Structure
+Plaintext
+
+finance/
+├── ai_services/              # The "Brain" of the system
+│   ├── inference/
+│   │   ├── classical.py      # Logistic Regression Predictor
+│   │   └── llm.py            # LangChain Agent
+│   ├── training/
+│   │   └── trainer.py        # Training Pipeline Script
+│   └── model_artifacts/      # Saved .pkl models
+├── backend/                  # FastAPI Application
+│   ├── main.py               # API Endpoints & Logic
+│   ├── database.py           # MongoDB Connection
+│   └── schemas.py            # Pydantic Data Models
+├── frontend/                 # Streamlit UI
+│   └── dashboard.py          # Interactive Web App
+├── data/                     # Raw CSV Data
+├── .env                      # API Keys (GitIgnored)
+└── requirements.txt          # Python Dependencies
+🔮 Future Enhancements
+Auto-Retraining: Automatically trigger trainer.py when MongoDB collects 100 new disagreement logs.
+
+Vector Database: Implement RAG (Retrieval Augmented Generation) to compare news against historical trends.
+
+Model Swapping: Allow users to switch between GPT-4, Claude, or Llama 2 via the UI
