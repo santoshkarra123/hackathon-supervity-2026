@@ -1,5 +1,7 @@
 from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
+# UPDATED: Import Prompts from Core (Best Practice)
+from langchain_core.prompts import PromptTemplate
+# UPDATED: Import Parsers from Main LangChain
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 import os
 from dotenv import load_dotenv

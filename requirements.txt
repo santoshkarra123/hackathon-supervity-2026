@@ -4,12 +4,13 @@ streamlit
 scikit-learn
 pandas
 pymongo
-langchain
-langchain-community
-langchain-core
-langchain-openai
 python-dotenv
 joblib
 numpy
 pydantic
 requests
+# Strict versions to prevent conflicts
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
